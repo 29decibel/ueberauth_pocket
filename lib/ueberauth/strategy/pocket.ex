@@ -15,10 +15,12 @@ defmodule Ueberauth.Strategy.Pocket do
   ]
 
   def handle_request!(conn) do
-    %{"code" => req_token} = post!(
-      @request_token_endpoint,
-      %{redirect_uri: callback_url(conn)}
-    )
+    %{"code" => req_token} =
+      post!(
+        @request_token_endpoint,
+        %{redirect_uri: callback_url(conn)}
+      )
+
     conn
     |> put_session(:pocket_request_token, req_token)
     |> auth_redirect(req_token)
@@ -29,11 +31,12 @@ defmodule Ueberauth.Strategy.Pocket do
       request_token: req_token,
       redirect_uri: callback_url(conn)
     }
+
     redirect!(conn, authorize_url(params))
   end
 
   defp authorize_url(params) do
-   "#{@authorize_endpoint}?#{URI.encode_query(params)}"
+    "#{@authorize_endpoint}?#{URI.encode_query(params)}"
   end
 
   def handle_callback!(conn) do
@@ -62,14 +65,17 @@ defmodule Ueberauth.Strategy.Pocket do
   end
 
   defp post!(url, extra_params) do
-    post_body = %{consumer_key: consumer_key()}
+    post_body =
+      %{consumer_key: consumer_key()}
       |> Map.merge(extra_params)
-      |> Poison.encode!
+      |> Jason.encode!()
+
     %{
       status_code: 200,
       body: body
     } = HTTPoison.post!(url, post_body, @headers)
-    Poison.decode!(body)
+
+    Jason.decode!(body)
   end
 
   @doc false
@@ -92,9 +98,11 @@ defmodule Ueberauth.Strategy.Pocket do
 
   @doc false
   def extra(conn) do
-    %Extra{raw_info: %{
-      access_token: conn.private.pocket_token,
-      username: conn.private.pocket_user}
+    %Extra{
+      raw_info: %{
+        access_token: conn.private.pocket_token,
+        username: conn.private.pocket_user
+      }
     }
   end
 end
