@@ -28,7 +28,7 @@ defmodule UeberauthPocket.Mixfile do
   defp deps do
     [
       {:ueberauth, "~> 0.4"},
-      {:httpoison, "~> 0.11"},
+      {:httpoison, "~> 1.8"},
       {:jason, "~> 1.2"},
       {:credo, "~> 0.5", only: [:dev, :test]},
       # docs dependencies
